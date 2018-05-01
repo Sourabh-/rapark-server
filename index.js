@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const http = require('http');
+const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 
 const config = JSON.parse(fs.readFileSync("./config.json"));
@@ -29,8 +30,13 @@ app.use('/rapark/otp', otp);
 app.use('/rapark/settings', settings);
 
 //Connect to mongoDB
-MongoClient.connect(config.mongo.url, function(err, db) {
-  app.db = db;
+MongoClient.connect(config.mongo.url, function(err, client) {
+  if(err) {
+  	console.log(err);
+  	return process.exit(1);
+  }
+
+  app.db = client.db(config.mongo.dbName);
 })
 
 /**

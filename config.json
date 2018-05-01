@@ -1,9 +1,25 @@
 {
 	"mongo": {
-		"_comment": "mongodb://127.0.0.1:27017/Database",
-		"url": "mongodb://127.0.0.1:27017/database"
+		"url": "mongodb://127.0.0.1:27017",
+		"dbName": "database"
 	},
 	"server": {
 		"port": 5000
+	},
+	"otp": {
+		"phoneNumberLength": 10,
+		"otpLength": 5
+	},
+	"plivo": {
+		"plivoAuthId": "MANTBIMMEWMDKXODJHZJ",
+		"plivoAuthToken":  "ZjZiNzA5MjAyYTcyZGI2NmU1NDQ4MGRkZDE5ODEy"
+	},
+	"settings": {
+		"firstHour": 20,
+		"additionalHour": 10,
+		"customCharges": {
+			"hours": 12,
+			"amount": 200
+		}
 	}
 }
