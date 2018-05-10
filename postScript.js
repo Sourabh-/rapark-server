@@ -37,22 +37,22 @@ rl.question('Enter Mongo Host: ', (host) => {
         	muser = muser || '';
             rl.question('Enter Mongo password, if any (Press enter if not needed): ', (mpwd) => {
             	mpwd = mpwd || '';
-                rl.question('Enter Mongo database name: ', (mdb) => {
+                rl.question('Enter Mongo database name (Default to `database`): ', (mdb) => {
                     let mUrl = 'mongodb://' + (muser && mpwd ? (muser + ':' + mpwd + '@') : '') + mongoHost + ':' + mongoPort;
 
                     console.log("Connecting to database...");
-                    MongoClient.connect(mUrl, function(err, db) {
+                    MongoClient.connect(mUrl, function(err, client) {
                         if (!err) {
                             let db = client.db(mdb || 'database');
-                            db.collection('settings').find({}, {})
+                            db.collection('settings').find({}, {}).toArray()
                                 .then((reslt) => {
-                                    if (reslt.length) {
+                                    if (!reslt.length) {
                                         console.log("Adding settings");
                                         db.collection('settings').insert([carSettings, bikeSettings], {})
                                             .then((reslt) => {
                                                 console.log("Settings inserted.");
                                                 console.log("Exiting...");
-                                                process.close();
+                                                process.exit();
                                             })
                                             .catch((err) => {
                                                 console.log(err);
