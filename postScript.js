@@ -26,6 +26,9 @@ let bikeSettings = {
     type: 'BIKE'
 };
 
+let mongoHost = '127.0.0.1';
+let mongoPort = '27017';
+
 rl.question('Enter Mongo Host: ', (host) => {
     mongoHost = host || mongoHost;
     rl.question('Enter Mongo Port: ', (port) => {
@@ -40,7 +43,7 @@ rl.question('Enter Mongo Host: ', (host) => {
                     console.log("Connecting to database...");
                     MongoClient.connect(mUrl, function(err, db) {
                         if (!err) {
-                            let db = client.db(mdb);
+                            let db = client.db(mdb || 'database');
                             db.collection('settings').find({}, {})
                                 .then((reslt) => {
                                     if (reslt.length) {
