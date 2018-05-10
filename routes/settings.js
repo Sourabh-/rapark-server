@@ -4,32 +4,45 @@ const fs = require('fs');
 const messages = JSON.parse(fs.readFileSync('./utility/messages.json'));
 let config = JSON.parse(fs.readFileSync("./config.json"));
 
-let bus = require('../utility/event');
-
 //Generate OTP, save to DB & send SMS
-router.post("/v1/create", (req, res) => {
-	let settings = config.settings;
-	for(let key in req.body) {
-		settings[key] = req.body[key];
-	}
-
-	fs.writeFile('config.json', JSON.stringify(config), (err) => {
-		if(err) {
+router.post("/v1/create/:type", (req, res) => {
+	if(['CAR', 'BIKE'].indexOf(req.params.type) == -1) {
+		res.status(400).json({
+			message: message.INVALID_TYPE
+		})
+	} else {
+		let json = req.body;
+		json.type = req.params.type;
+		req.app.db.collection('settings').updateOne({ type: req.params.type }, { $set: json }, {
+			upsert: true
+		})
+		.then((reslt) => {
+			res.status(204).json();
+		})
+		.catch((err) => {
 			console.log(err);
 			res.status(500).json({
 				message: messages.ise
-			})
-		} else {
-			res.status(204).json();
-
-			//Publish updates
-			bus.emit('configChange');
-		}
-	})
+			});
+		})
+	}
 });
 
-router.get("/v1/get", (req, res) => {
-	res.status(200).json(config.settings);
+router.get("/v1/get/:type", (req, res) => {
+	req.app.db.collection('settings').findOne({ type: req.params.type }, {
+		projection: { _id: 0 }
+	})
+	.then((reslt) => {
+		if(reslt) res.status(200).json(reslt);
+		else res.status(204).json();
+	})
+	.catch((err) => {
+		console.log(err);
+		res.status(500).json({
+			message: messages.ise
+		})
+	})
+
 })
 
 module.exports = router;

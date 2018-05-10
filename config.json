@@ -14,12 +14,13 @@
 		"plivoAuthId": "MANTBIMMEWMDKXODJHZJ",
 		"plivoAuthToken":  "ZjZiNzA5MjAyYTcyZGI2NmU1NDQ4MGRkZDE5ODEy"
 	},
-	"settings": {
-		"firstHour": 20,
-		"additionalHour": 10,
-		"customCharges": {
-			"hours": 12,
-			"amount": 200
-		}
+	"place": {
+		"name": "Phoenix Market City"
+	},
+	"phone": {
+		"countryCode": "+91"
+	},
+	"currency": {
+		"symbol": "₹"
 	}
 }

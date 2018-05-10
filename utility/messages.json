@@ -4,5 +4,7 @@
 	"MIN_PHONE_NUMBER_LENGTH": 	"Should have $number$ digits",
 	"ISE": "Oops! Looks like something isn't right!",
 	"INVALID_OTP": "Otp is not a valid number",
-	"OTP_NOT_FOUND": "OTP not found"
+	"OTP_NOT_FOUND": "OTP not found",
+	"TYPE_REQUIRED": "Type is required",
+	"INVALID_TYPE": "Not a valid type"
 }
