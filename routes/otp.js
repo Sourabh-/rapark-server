@@ -36,11 +36,12 @@ let sendSMS = (srcNo, destNo, msg, cb) => {
 let charges = {};
 
 let getCharges = (db, type, cb) => {
-    if(charges)
+    if(Object.keys(charges).length)
         cb(charges);
     else {
         db.collection('settings').findOne({ type }, {})
         .then((reslt) => {
+            console.log(reslt);
             if(reslt) { 
                 charges = reslt;
                 cb(reslt); 
@@ -137,6 +138,7 @@ router.get("/v1/payment/:otp", (req, res) => {
 			if(reslt) {
                 getCharges(req.app.db, reslt.type, (charges) => {
                     let hours = Math.ceil((new Date().getTime() - reslt.createdTime) / (1000 * 60 * 60));
+                    let minutes = Math.ceil(((new Date().getTime() - reslt.createdTime) % (1000 * 60 * 60))/(1000 * 60));
                     if(charges.customCharges && charges.customCharges.hours && hours >= charges.customCharges.hours) {
                         res.status(200).json({
                             phoneNumber: reslt.phoneNumber,
@@ -151,7 +153,7 @@ router.get("/v1/payment/:otp", (req, res) => {
                             amount: charges.first2Hours
                         });
 
-                        sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${charges.firstHour} - RaPark`);
+                        sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${charges.first2Hours} - RaPark`);
                         saveToDB(req.app.db, reslt._id, hours, charges.first2Hours);
                     } else {
                         let amt = charges.first2Hours;
@@ -159,7 +161,8 @@ router.get("/v1/payment/:otp", (req, res) => {
 
                         res.status(200).json({
                             phoneNumber: reslt.phoneNumber,
-                            amount: amt
+                            amount: amt,
+                            time: `${('0' + hours).slice(-2)} HRS ${minutes} MIN`
                         });
 
                         sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${amt} - RaPark`);
