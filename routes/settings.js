@@ -13,7 +13,7 @@ router.post("/v1/create/:type", (req, res) => {
 	} else {
 		let json = req.body;
 		json.type = req.params.type;
-		req.app.db.collection('settings').updateOne({ type: req.params.type }, { $set: json }, {
+		req.db.collection('settings').updateOne({ type: req.params.type }, { $set: json }, {
 			upsert: true
 		})
 		.then((reslt) => {
@@ -29,7 +29,7 @@ router.post("/v1/create/:type", (req, res) => {
 });
 
 router.get("/v1/get/:type", (req, res) => {
-	req.app.db.collection('settings').findOne({ type: req.params.type }, {
+	req.db.collection('settings').findOne({ type: req.params.type }, {
 		projection: { _id: 0 }
 	})
 	.then((reslt) => {

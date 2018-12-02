@@ -10,3 +10,17 @@ exports.replaceStr = (str, arr) => {
 
 	return str;
 }
+
+exports.decrypt = (crypto, algorithm, password, key) => {
+	var decipher = crypto.createDecipher(algorithm, password)
+	var dec = decipher.update(key,'hex','utf8')
+	dec += decipher.final('utf8');
+	return dec;
+}
+
+exports.encrypt = (crypto, algorithm, password, dbName) => {
+  var cipher = crypto.createCipher(algorithm, password)
+  var crypted = cipher.update(dbName, 'utf8', 'hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}

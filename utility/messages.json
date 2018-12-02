@@ -6,5 +6,7 @@
 	"INVALID_OTP": "Otp is not a valid number",
 	"OTP_NOT_FOUND": "OTP not found",
 	"TYPE_REQUIRED": "Type is required",
-	"INVALID_TYPE": "Not a valid type"
+	"INVALID_TYPE": "Not a valid type",
+	"NO_AUTH_TOKEN": "No auth token provided",
+	"INVALID_SESSION_ID": "Invalid session Id"
 }

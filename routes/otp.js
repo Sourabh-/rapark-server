@@ -95,7 +95,7 @@ router.post("/v1/create", (req, res) => {
             hours: ""
         };
 
-        req.app.db.collection("parking").insertOne(vehicle)
+        req.db.collection("parking").insertOne(vehicle)
             .then((reslt) => {
                 res.status(204).json();
                 let otp = randomstring.generate({
@@ -105,7 +105,7 @@ router.post("/v1/create", (req, res) => {
 
                 //SEND SMS HERE
                 sendSMS('8892371403', vehicle.phoneNumber, `Your OTP for entry in ${config.place.name} is ${otp}. Please use this at the time of exit - RaPark`, () => {
-                	req.app.db.collection("parking").updateOne({ _id: vehicle._id }, { $set: { otp } }, {
+                	req.db.collection("parking").updateOne({ _id: vehicle._id }, { $set: { otp } }, {
 				      returnOriginal: false
 				    }).then((reslt) => {
 				      
@@ -133,10 +133,10 @@ router.get("/v1/payment/:otp", (req, res) => {
 		})
 	} else {
 		//Find entry with this otp and isExited = false, mark isExited = true, calculate paid and hours and update record
-		req.app.db.collection('parking').findOne({ otp: req.params.otp, isExited: false }, {})
+		req.db.collection('parking').findOne({ otp: req.params.otp, isExited: false }, {})
 		.then((reslt) => {
 			if(reslt) {
-                getCharges(req.app.db, reslt.type, (charges) => {
+                getCharges(req.db, reslt.type, (charges) => {
                     let hours = Math.ceil((new Date().getTime() - reslt.createdTime) / (1000 * 60 * 60));
                     let minutes = Math.ceil(((new Date().getTime() - reslt.createdTime) % (1000 * 60 * 60))/(1000 * 60));
                     if(charges.customCharges && charges.customCharges.hours && hours >= charges.customCharges.hours) {
@@ -146,7 +146,7 @@ router.get("/v1/payment/:otp", (req, res) => {
                         });
 
                         sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${charges.customCharges.amount} - RaPark`);
-                        saveToDB(req.app.db, reslt._id, hours, charges.customCharges.amount);
+                        saveToDB(req.db, reslt._id, hours, charges.customCharges.amount);
                     } else if(hours <= 2) {
                         res.status(200).json({
                             phoneNumber: reslt.phoneNumber,
@@ -154,7 +154,7 @@ router.get("/v1/payment/:otp", (req, res) => {
                         });
 
                         sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${charges.first2Hours} - RaPark`);
-                        saveToDB(req.app.db, reslt._id, hours, charges.first2Hours);
+                        saveToDB(req.db, reslt._id, hours, charges.first2Hours);
                     } else {
                         let amt = charges.first2Hours;
                         for(let i=3; i <= hours; i++) amt += charges.additionalHour;
@@ -166,7 +166,7 @@ router.get("/v1/payment/:otp", (req, res) => {
                         });
 
                         sendSMS('8892371403', reslt.phoneNumber, `Thank you for parking your vehicle in ${config.place.name}. Amount payable is ${config.currency.symbol}${amt} - RaPark`);
-                        saveToDB(req.app.db, reslt._id, hours, amt);
+                        saveToDB(req.db, reslt._id, hours, amt);
                     }
                 })
 
